@@ -1,5 +1,5 @@
 # Kotlin JIB Example
-This simple sample project demonstrates capabilities of JIB - a new tool by Google targeted to simplify containerising your JVM apps (you can read more about it in [Introducing Jib — build Java Docker images better](https://cloud.google.com/blog/products/gcp/introducing-jib-build-java-docker-images-better)). There are also other options to do the same thing - e.g. writing your own Dockerfile, using [docker-maven-plugin](https://github.com/fabric8io/docker-maven-plugin) or [docker-maven-plugin](https://github.com/spotify/docker-maven-plugin).
+This sample project demonstrates capabilities of JIB - a new tool by Google targeted to simplify containerising your JVM apps (you can read more about it in [Introducing Jib — build Java Docker images better](https://cloud.google.com/blog/products/gcp/introducing-jib-build-java-docker-images-better)). There are also other options to do the same thing - e.g. writing your own Dockerfile, using [docker-maven-plugin](https://github.com/fabric8io/docker-maven-plugin) or [docker-maven-plugin](https://github.com/spotify/docker-maven-plugin).
 
 JIB is advertised to have 2 main advantages:
 
@@ -14,10 +14,10 @@ This projects focuses to demonstrate the second feature.
 In order to complete the steps below you will need:
 * Java 8 or higher
 * Docker installed locally (Linux, Docker for Mac or Docker for Windows)
-    * I have used Docker version 18.06 and the commands inspecting the docker layers might not work in other major versions of Docker
+    * _I have used Docker version 18.06 - the commands inspecting the docker layers might not work in other major versions of Docker_
 
 # Project setup
-This sample project has been created using [start.spring.io](http://start.spring.io/) so it is based on spring-boot. To make things a bit more fancy I have created it using Gradle as the build and Kotlin as the language, but the principles will stay the same for other build tools (Maven) or JVM languages (Java, Groovy, Scala, etc.).
+This sample project has been created using [start.spring.io](http://start.spring.io/) so it is based on spring-boot. To make things a bit more fancy I have created it using Gradle as the build tool and Kotlin as the language, but the principles will stay the same for other build tools (Maven) or JVM languages (Java, Groovy, Scala, etc.).
 
 ![spring-boot](./docs/spring-boot.png)
 
@@ -59,7 +59,7 @@ First, we will check the current list of our docker images:
 docker images
 ```
 
-![docker-images](./docs/docker-images.png)
+![docker-images-prior-to-push](./docs/docker-images-prior-to-push.png)
 
 (we can see I have just some RabbitMQ images)
 
@@ -107,7 +107,7 @@ docker history kotlin-jib-example:0.0.1-SNAPSHOT
 
 ![docker-history](./docs/docker-history.png)
 
-From that we can very roughly guess that the bottom 3 layer are the base image (said to be distroless by JIB docs). The 3rd from the top are likely our spring-boot dependencies (jars), 2nd are resources (we don't have any) and 1st are actual code.
+From that we can very roughly guess that the bottom 3 layer are the base image (said to be distroless by JIB docs). The 3rd from the top are likely our spring-boot dependencies (jars), 2nd are resources (we don't have any) and 1st are the actual code.
 
 If you are not satisfied by this rough guess (just like me), you can further inspect the image by following commands.
 
@@ -118,13 +118,14 @@ mkdir docker-layers
 tar xf kotlin-jib-example-layers.tar -C docker-layers
 ```
 
-![extracing-layers](./docs/extracing-layers.png)
+![extracting-layers](./docs/extracting-layers.png)
 
-No we can run a script that will show us the contents of the layers (this basically iterates the _tar_ files, which contain the layer filesystem and prints them, the _awk_ section is used to limit the depth of the printing to 3 levels):
+No we can run a script which will show us the contents of the layers (this basically iterates the _tar_ files, which contain the layer filesystems of each layer and prints them, the _awk_ section is used to limit the depth of the printing to 3 levels):
 ```sh
 for layer in docker-layers/*/*.tar; do printf '%20s\n' | tr ' ' -; echo $layer; tar tvf $layer | awk -F/ '{if (NF<5) print }'; done;
 ```
 The output of the command is quite long, but have mainly the following sections
+
 Java 8 (OpenJDK):
 
 ![layer-linux-openjdk.png](./docs/layer-linux-openjdk.png)
